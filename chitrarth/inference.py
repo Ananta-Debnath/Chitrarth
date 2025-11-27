@@ -99,7 +99,7 @@ def eval_model(tokenizer, model, image_processor, context_len, query, image_file
         image_tensor = None
         if args.image_file:
             image = Image.open(args.image_file).convert("RGB")
-            image_tensor = image_processor.preprocess(
+            image_tensor = image_processor(
                 image,
                 return_tensors="pt",
                 padding=True

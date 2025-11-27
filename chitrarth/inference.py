@@ -98,7 +98,7 @@ def eval_model(tokenizer, model, image_processor, context_len, query, image_file
         # image = load_image(image_file)
         image = Image.open(image_file).convert("RGB")
         images = [image]
-        image_tensor = image_processor.preprocess(images, return_tensors='pt', do_resize=True, do_normalize=True)['pixel_values'].half().cuda()
+        image_tensor = image_processor.preprocess(images, return_tensors='pt', do_resize=True, do_normalize=True, padding=True)['pixel_values'].half().cuda()
     else:
         image_tensor = None
         prompt = prompt.replace(DEFAULT_IMAGE_TOKEN + '\n', '')

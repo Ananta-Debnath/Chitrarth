@@ -15,6 +15,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig, BitsAn
 from chitrarth.model.builder import load_pretrained_model
 from chitrarth.mm_utils import get_model_name_from_path
 import torch
+from torchvision import transforms
 import string
 from chitrarth.model import *
 
@@ -96,14 +97,16 @@ def eval_model(tokenizer, model, image_processor, context_len, query, image_file
     # print("prompt ", {prompt})
     if image_file:
         # image = load_image(image_file)
+        # Data preprocessing and augmentation
+        data_transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
         image_tensor = None
         if args.image_file:
             image = Image.open(args.image_file).convert("RGB")
-            image_tensor = image_processor(
-                image,
-                return_tensors="pt",
-                padding=True
-            )["pixel_values"].half().to("cuda")
+            image_tensor = data_transform(image)
     else:
         image_tensor = None
         prompt = prompt.replace(DEFAULT_IMAGE_TOKEN + '\n', '')

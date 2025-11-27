@@ -11,6 +11,19 @@ from transformers.modeling_outputs import CausalLMOutputWithPast
 from .mpt.modeling_mpt import MPTConfig, MPTForCausalLM, MPTModel
 from chitrarth.model.chitrarth_arch import ChitrarthMetaModel, ChitrarthMetaForCausalLM
 
+import torch.nn as nn
+
+class _EmbeddingToLogits(nn.Module):
+    def __init__(self, emb_weight):
+        super().__init__()
+        # store a reference to the embedding weight (nn.Parameter from nn.Embedding)
+        self.weight = emb_weight
+
+    def forward(self, hidden_states):
+        # hidden_states: (batch, seq_len, d_model)
+        # returns logits: (batch, seq_len, vocab_size)
+        return F.linear(hidden_states, self.weight)
+
 
 class ChitrarthConfig(MPTConfig):
     model_type = "chitrarth"
@@ -49,6 +62,15 @@ class ChitrarthForCausalLM(MPTForCausalLM, ChitrarthMetaForCausalLM):
 
     def get_model(self):
         return self.transformer
+    
+    # inside ChitrarthForCausalLM:
+    def get_output_embeddings(self):
+        """
+        Return a module that projects hidden states to token logits using
+        the tied embedding weights. This does not re-register the Parameter,
+        it only references the existing embedding weight.
+        """
+        return _EmbeddingToLogits(self.transformer.wte.weight)
 
     def _set_gradient_checkpointing(self, module, value=False):
         if isinstance(module, ChitrarthModel):

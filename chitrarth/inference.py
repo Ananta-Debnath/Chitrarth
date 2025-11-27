@@ -98,11 +98,7 @@ def eval_model(tokenizer, model, image_processor, context_len, query, image_file
     if image_file:
         # image = load_image(image_file)
         # Data preprocessing and augmentation
-        data_transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
+        data_transform = transforms.ToTensor()
         image_tensor = None
         if args.image_file:
             image = Image.open(args.image_file).convert("RGB")

@@ -95,7 +95,8 @@ def eval_model(tokenizer, model, image_processor, context_len, query, image_file
     prompt = prompt.strip()
     # print("prompt ", {prompt})
     if image_file:
-        image = load_image(image_file)
+        # image = load_image(image_file)
+        image = Image.open(image_file).convert("RGB")
         image_tensor = image_processor.preprocess([image], return_tensors='pt', padding=True)['pixel_values'].half().cuda()
     else:
         image_tensor = None

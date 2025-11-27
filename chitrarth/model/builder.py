@@ -56,7 +56,7 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
         else:
             if 'chitrarth' in model_name.lower():
                 tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
-                model = ChitrarthForCausalLM.from_pretrained(model_path, low_cpu_mem_usage=True, **kwargs)
+                model = ChitrarthForCausalLM.from_pretrained(model_path, low_cpu_mem_usage=True, load_in_4bit=True, torch_dtype=torch.float16, trust_remote_code=True)
     else:
         # Load language model
         if model_base is not None:
